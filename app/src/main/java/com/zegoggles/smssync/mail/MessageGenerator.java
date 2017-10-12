@@ -198,8 +198,9 @@ class MessageGenerator {
     }
 
     private String getSubject(@NotNull DataType type, @NotNull PersonRecord record) {
+        //TODO: Folder is fixed to -1, correct?
         return mPrefix ?
-                String.format(Locale.ENGLISH, "[%s] %s", type.getFolder(PreferenceManager.getDefaultSharedPreferences(mContext)), record.getName()) :
+                String.format(Locale.ENGLISH, "[%s] %s", type.getFolder(PreferenceManager.getDefaultSharedPreferences(mContext), -1), record.getName()) :
                 mContext.getString(type.withField, record.getName());
     }
 

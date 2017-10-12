@@ -14,19 +14,21 @@ import java.util.NoSuchElementException;
 import static com.zegoggles.smssync.App.TAG;
 import static com.zegoggles.smssync.service.BackupItemsFetcher.emptyCursor;
 
-public class BackupCursors implements Iterator<BackupCursors.CursorAndType> {
+public class BackupCursors implements Iterator<BackupCursors.ExtendedCursor> {
     private Map<DataType, Cursor> cursorMap = new HashMap<DataType, Cursor>();
-    private List<CursorAndType> cursorAndTypes = new ArrayList<CursorAndType>();
+    private List<ExtendedCursor> extendedCursors = new ArrayList<ExtendedCursor>();
 
     private int index;
 
-    public static class CursorAndType {
+    public static class ExtendedCursor {
         final DataType type;
         final Cursor cursor;
+        final int simCardNumber;
 
-        public CursorAndType(DataType type, Cursor cursor) {
+        public ExtendedCursor(DataType type, Cursor cursor, int simCardNumber) {
             this.type = type;
             this.cursor = cursor;
+            this.simCardNumber = simCardNumber;
         }
 
         public boolean hasNext() {
@@ -34,28 +36,29 @@ public class BackupCursors implements Iterator<BackupCursors.CursorAndType> {
         }
 
         @Override public String toString() {
-            return "CursorAndType{" +
+            return "ExtendedCursor{" +
                     "type=" + type +
                     ", cursor=" + cursor +
+                    ", simCardNumber=" + simCardNumber +
                     '}';
         }
 
-        public static CursorAndType empty() {
-            return new CursorAndType(DataType.SMS, emptyCursor());
+        public static ExtendedCursor empty() {
+            return new ExtendedCursor(DataType.SMS, emptyCursor(), 0);
         }
     }
 
     BackupCursors() {
     }
 
-    void add(DataType type, Cursor cursor) {
-        cursorAndTypes.add(new CursorAndType(type, cursor));
+    void add(DataType type, Cursor cursor, int simCardNumber) {
+        extendedCursors.add(new ExtendedCursor(type, cursor, simCardNumber));
         cursorMap.put(type, cursor);
     }
 
     public int count() {
         int total = 0;
-        for (CursorAndType ct : cursorAndTypes) {
+        for (ExtendedCursor ct : extendedCursors) {
             total += ct.cursor.getCount();
         }
         return total;
@@ -67,11 +70,11 @@ public class BackupCursors implements Iterator<BackupCursors.CursorAndType> {
     }
 
     @Override public boolean hasNext() {
-        return !cursorAndTypes.isEmpty() && (getCurrent().hasNext() || getNextNonEmptyIndex() != -1);
+        return !extendedCursors.isEmpty() && (getCurrent().hasNext() || getNextNonEmptyIndex() != -1);
     }
 
-    @Override public CursorAndType next() {
-        if (cursorAndTypes.isEmpty()) throw new NoSuchElementException();
+    @Override public ExtendedCursor next() {
+        if (extendedCursors.isEmpty()) throw new NoSuchElementException();
 
         if (getCurrent().hasNext()) {
             getCurrentCursor().moveToNext();
@@ -90,7 +93,7 @@ public class BackupCursors implements Iterator<BackupCursors.CursorAndType> {
     }
 
     public void close() {
-        for (CursorAndType ct : cursorAndTypes) {
+        for (ExtendedCursor ct : extendedCursors) {
             try {
                 ct.cursor.close();
             } catch (Exception e) {
@@ -100,16 +103,16 @@ public class BackupCursors implements Iterator<BackupCursors.CursorAndType> {
     }
 
     private int getNextNonEmptyIndex() {
-        for (int i = index + 1; i < cursorAndTypes.size(); i++) {
-            if (cursorAndTypes.get(i).hasNext()) {
+        for (int i = index + 1; i < extendedCursors.size(); i++) {
+            if (extendedCursors.get(i).hasNext()) {
                 return i;
             }
         }
         return -1;
     }
 
-    private CursorAndType getCurrent() {
-        return index < cursorAndTypes.size() ? cursorAndTypes.get(index) : CursorAndType.empty();
+    private ExtendedCursor getCurrent() {
+        return index < extendedCursors.size() ? extendedCursors.get(index) : ExtendedCursor.empty();
     }
 
 

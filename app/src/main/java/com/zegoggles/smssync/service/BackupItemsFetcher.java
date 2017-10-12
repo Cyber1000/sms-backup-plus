@@ -32,9 +32,9 @@ public class BackupItemsFetcher {
 
     public
     @NotNull
-    Cursor getItemsForDataType(DataType dataType, ContactGroupIds group, int max) {
+    Cursor getItemsForDataType(DataType dataType, ContactGroupIds group, int max, int simCardNumber) {
         if (LOCAL_LOGV) Log.v(TAG, "getItemsForDataType(type=" + dataType + ", max=" + max + ")");
-        return performQuery(queryBuilder.buildQueryForDataType(dataType, group, max));
+        return performQuery(queryBuilder.buildQueryForDataType(dataType, group, max, simCardNumber));
     }
 
     public long getMostRecentTimestamp(DataType dataType) {

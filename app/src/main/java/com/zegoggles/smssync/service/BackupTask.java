@@ -140,7 +140,7 @@ class BackupTask extends AsyncTask<BackupConfig, BackupState, BackupState> {
         try {
             final ContactGroupIds groupIds = contactAccessor.getGroupContactIds(service.getContentResolver(), config.groupToBackup);
 
-            cursors = new BulkFetcher(fetcher).fetch(config.typesToBackup, groupIds, config.maxItemsPerSync);
+            cursors = new BulkFetcher(fetcher).fetch(config.typesToBackup, groupIds, config.maxItemsPerSync, service.getApplicationContext());
             final int itemsToSync = cursors.count();
 
             if (itemsToSync > 0) {
@@ -256,7 +256,7 @@ class BackupTask extends AsyncTask<BackupConfig, BackupState, BackupState> {
             publish(CALC);
             int backedUpItems = 0;
             while (!isCancelled() && cursors.hasNext()) {
-                BackupCursors.CursorAndType cursor = cursors.next();
+                BackupCursors.ExtendedCursor cursor = cursors.next();
                 if (LOCAL_LOGV) Log.v(TAG, "backing up: " + cursor);
 
                 ConversionResult result = converter.convertMessages(cursor.cursor, cursor.type);
@@ -268,7 +268,7 @@ class BackupTask extends AsyncTask<BackupConfig, BackupState, BackupState> {
                                 messages.size(), cursor.type));
                     }
 
-                    store.getFolder(cursor.type).appendMessages(messages);
+                    store.getFolder(cursor.type, cursor.simCardNumber).appendMessages(messages);
 
                     if (cursor.type == CALLLOG && calendarSyncer != null) {
                         calendarSyncer.syncCalendar(result);

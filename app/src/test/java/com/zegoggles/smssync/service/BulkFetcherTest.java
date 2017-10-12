@@ -37,7 +37,7 @@ public class BulkFetcherTest {
         when(fetcher.getItemsForDataType(SMS, null, 50)).thenReturn(cursor(3));
         when(fetcher.getItemsForDataType(MMS, null, 47)).thenReturn(cursor(5));
 
-        BackupCursors cursors = bulkFetcher.fetch(EnumSet.of(SMS, MMS), null, 50);
+        BackupCursors cursors = bulkFetcher.fetch(EnumSet.of(SMS, MMS), null, 50, service.getApplicationContext());
 
         assertThat(cursors.count()).isEqualTo(8);
         assertThat(cursors.count(SMS)).isEqualTo(3);
@@ -47,7 +47,7 @@ public class BulkFetcherTest {
     @Test public void shouldFetchAllItemsRespectingMaxItems() throws Exception {
         when(fetcher.getItemsForDataType(SMS, null, 5)).thenReturn(cursor(5));
 
-        BackupCursors cursors = bulkFetcher.fetch(EnumSet.of(SMS, MMS), null, 5);
+        BackupCursors cursors = bulkFetcher.fetch(EnumSet.of(SMS, MMS), null, 5, service.getApplicationContext());
 
         assertThat(cursors.count()).isEqualTo(5);
         assertThat(cursors.count(SMS)).isEqualTo(5);
@@ -57,7 +57,7 @@ public class BulkFetcherTest {
 
 
     @Test public void shouldFetchAllItemsEmptyList() throws Exception {
-        BackupCursors cursors = bulkFetcher.fetch(EnumSet.noneOf(DataType.class), null, 50);
+        BackupCursors cursors = bulkFetcher.fetch(EnumSet.noneOf(DataType.class), null, 50, service.getApplicationContext());
         assertThat(cursors.count()).isEqualTo(0);
     }
 

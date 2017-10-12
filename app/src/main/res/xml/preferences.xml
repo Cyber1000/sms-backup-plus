@@ -146,6 +146,13 @@
                     android:persistent="true"
                     android:defaultValue="SMS"/>
 
+            <CheckBoxPreference
+                android:key="imap_folder_multisim_postfix"
+                android:title="@string/ui_imap_folder_multisim_postfix_label"
+                android:summary="@string/ui_imap_folder_multisim_postfix_desc"
+                android:persistent="true"
+                android:defaultValue="false"/>
+
             <ListPreference
                     android:key="backup_contact_group"
                     android:title="@string/ui_backup_contact_group_label"

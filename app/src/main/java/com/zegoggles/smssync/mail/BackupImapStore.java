@@ -67,10 +67,11 @@ public class BackupImapStore extends ImapStore {
         this.context = context;
     }
 
-    public BackupFolder getFolder(DataType type) throws MessagingException {
-        BackupFolder folder = openFolders.get(type);
+    public BackupFolder getFolder(DataType type, int simCardNumber) throws MessagingException {
+        //TODO: deactivated foldername coupled to type
+        BackupFolder folder = null; //openFolders.get(type);
         if (folder == null) {
-            String label = type.getFolder(PreferenceManager.getDefaultSharedPreferences(context));
+            String label = type.getFolder(PreferenceManager.getDefaultSharedPreferences(context), simCardNumber);
             if (label == null) throw new IllegalStateException("label is null");
 
             folder = createAndOpenFolder(type, label);

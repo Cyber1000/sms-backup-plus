@@ -351,4 +351,6 @@
     to set SMS Backup+ as your SMS app during the restore operation. You will
     get asked to change it back to the original setting after restoring.
   </string>
+    <string name="ui_imap_folder_multisim_postfix_label">Handle Multisim</string>
+  <string name="ui_imap_folder_multisim_postfix_desc">Adds a postfix to the gmail label due to multisim</string>
 </resources>

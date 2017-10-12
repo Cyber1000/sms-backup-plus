@@ -53,11 +53,11 @@ public class BackupCursorsTest {
     @Test public void shouldIterateOverAllContainedCursors() throws Exception {
         for (int i=0; i<cursors.count(); i++) {
             assertThat(cursors.hasNext()).isTrue();
-            BackupCursors.CursorAndType cursorAndType = cursors.next();
+            BackupCursors.ExtendedCursor extendedCursor = cursors.next();
 
-            assertThat(cursorAndType).isNotNull();
-            assertThat(cursorAndType.cursor).isNotNull();
-            assertThat(cursorAndType.type).isNotNull();
+            assertThat(extendedCursor).isNotNull();
+            assertThat(extendedCursor.cursor).isNotNull();
+            assertThat(extendedCursor.type).isNotNull();
         }
         assertThat(cursors.hasNext()).isFalse();
 

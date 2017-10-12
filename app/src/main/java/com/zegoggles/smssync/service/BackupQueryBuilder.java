@@ -62,11 +62,11 @@ class BackupQueryBuilder {
         }
     }
 
-    public @Nullable Query buildQueryForDataType(DataType type, @Nullable ContactGroupIds groupIds, int max) {
+    public @Nullable Query buildQueryForDataType(DataType type, @Nullable ContactGroupIds groupIds, int max, int simCardNumber) {
         switch (type) {
-            case SMS:     return getQueryForSMS(groupIds, max);
-            case MMS:     return getQueryForMMS(groupIds, max);
-            case CALLLOG: return getQueryForCallLog(max);
+            case SMS:     return getQueryForSMS(groupIds, max, simCardNumber);
+            case MMS:     return getQueryForMMS(groupIds, max, simCardNumber);
+            case CALLLOG: return getQueryForCallLog(max, simCardNumber);
             default:      return null;
         }
     }
@@ -99,22 +99,24 @@ class BackupQueryBuilder {
         }
     }
 
-    private Query getQueryForSMS(@Nullable ContactGroupIds groupIds, int max) {
+    private Query getQueryForSMS(@Nullable ContactGroupIds groupIds, int max, int simCardNumber) {
         return new Query(Consts.SMS_PROVIDER,
             null,
             String.format(Locale.ENGLISH,
-                "%s > ? AND %s <> ? %s",
+                "%s > ? AND %s <> ? %s AND %s = ?",
                     Telephony.TextBasedSmsColumns.DATE,
                     Telephony.TextBasedSmsColumns.TYPE,
-                    groupSelection(SMS, groupIds)).trim(),
+                    groupSelection(SMS, groupIds),
+                    Telephony.TextBasedSmsColumns.SUBSCRIPTION_ID).trim(),
             new String[] {
                 String.valueOf(SMS.getMaxSyncedDate(preferences)),
-                String.valueOf(Telephony.TextBasedSmsColumns.MESSAGE_TYPE_DRAFT)
+                String.valueOf(Telephony.TextBasedSmsColumns.MESSAGE_TYPE_DRAFT),
+                Integer.toString(simCardNumber)
             },
             max);
     }
 
-    private Query getQueryForMMS(@Nullable ContactGroupIds group, int max) {
+    private Query getQueryForMMS(@Nullable ContactGroupIds group, int max, int simCardNumber) {
         long maxSynced = MMS.getMaxSyncedDate(preferences);
         if (maxSynced > 0) {
             // NB: max synced date is stored in seconds since epoch in database
@@ -123,24 +125,27 @@ class BackupQueryBuilder {
         return new Query(
             Consts.MMS_PROVIDER,
             null,
-            String.format(Locale.ENGLISH, "%s > ? AND %s <> ? %s",
+            String.format(Locale.ENGLISH, "%s > ? AND %s <> ? %s AND %s = ?",
                     Telephony.BaseMmsColumns.DATE,
                     Telephony.BaseMmsColumns.MESSAGE_TYPE,
-                    groupSelection(DataType.MMS, group)).trim(),
+                    groupSelection(DataType.MMS, group),
+                    Telephony.BaseMmsColumns.SUBSCRIPTION_ID).trim(),
             new String[] {
                 String.valueOf(maxSynced),
-                MmsConsts.DELIVERY_REPORT
+                MmsConsts.DELIVERY_REPORT,
+                Integer.toString(simCardNumber)
             },
             max);
     }
 
-    private Query getQueryForCallLog(int max) {
+    private Query getQueryForCallLog(int max, int simCardNumber) {
         return new Query(
             Consts.CALLLOG_PROVIDER,
             CALLLOG_PROJECTION,
-            String.format(Locale.ENGLISH, "%s > ?", CallLog.Calls.DATE),
+            String.format(Locale.ENGLISH, "%s > ? AND %s = ?", CallLog.Calls.DATE, CallLog.Calls.PHONE_ACCOUNT_ID),
             new String[] {
-                String.valueOf(CALLLOG.getMaxSyncedDate(preferences))
+                String.valueOf(CALLLOG.getMaxSyncedDate(preferences)),
+                Integer.toString(simCardNumber)
             },
             max);
     }
