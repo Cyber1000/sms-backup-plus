@@ -259,7 +259,7 @@ class BackupTask extends AsyncTask<BackupConfig, BackupState, BackupState> {
                 BackupCursors.ExtendedCursor cursor = cursors.next();
                 if (LOCAL_LOGV) Log.v(TAG, "backing up: " + cursor);
 
-                ConversionResult result = converter.convertMessages(cursor.cursor, cursor.type);
+                ConversionResult result = converter.convertMessages(cursor.cursor, cursor.type, cursor.simCardNumber);
                 if (!result.isEmpty()) {
                     List<Message> messages = result.getMessages();
 

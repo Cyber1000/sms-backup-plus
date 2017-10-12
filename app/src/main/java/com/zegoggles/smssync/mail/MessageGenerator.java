@@ -64,16 +64,16 @@ class MessageGenerator {
         mCallLogTypes = CallLogTypes.getCallLogType(new Preferences(context));
     }
 
-    public  @Nullable Message messageForDataType(Map<String, String> msgMap, DataType dataType) throws MessagingException {
+    public  @Nullable Message messageForDataType(Map<String, String> msgMap, DataType dataType, int simCardNumber) throws MessagingException {
         switch (dataType) {
-            case SMS: return messageFromMapSms(msgMap);
-            case MMS: return messageFromMapMms(msgMap);
-            case CALLLOG: return messageFromMapCallLog(msgMap);
+            case SMS: return messageFromMapSms(msgMap, simCardNumber);
+            case MMS: return messageFromMapMms(msgMap, simCardNumber);
+            case CALLLOG: return messageFromMapCallLog(msgMap, simCardNumber);
             default: return null;
         }
     }
 
-    private @Nullable Message messageFromMapSms(Map<String, String> msgMap) throws MessagingException {
+    private @Nullable Message messageFromMapSms(Map<String, String> msgMap, int simCardNumber) throws MessagingException {
         final String address = msgMap.get(Telephony.TextBasedSmsColumns.ADDRESS);
         if (TextUtils.isEmpty(address)) return null;
 
@@ -81,7 +81,7 @@ class MessageGenerator {
         if (!includePersonInBackup(record, DataType.SMS)) return null;
 
         final Message msg = new MimeMessage();
-        msg.setSubject(getSubject(DataType.SMS, record));
+        msg.setSubject(getSubject(DataType.SMS, record, simCardNumber));
         setBody(msg, new TextBody(msgMap.get(Telephony.TextBasedSmsColumns.BODY)));
 
         final int messageType = toInt(msgMap.get(Telephony.TextBasedSmsColumns.TYPE));
@@ -106,7 +106,7 @@ class MessageGenerator {
         return msg;
     }
 
-    private @Nullable Message messageFromMapMms(Map<String, String> msgMap) throws MessagingException {
+    private @Nullable Message messageFromMapMms(Map<String, String> msgMap, int simCardNumber) throws MessagingException {
         if (LOCAL_LOGV) Log.v(TAG, "messageFromMapMms(" + msgMap + ")");
 
         final Uri mmsUri = Uri.withAppendedPath(Consts.MMS_PROVIDER, msgMap.get(Telephony.BaseMmsColumns._ID));
@@ -121,7 +121,7 @@ class MessageGenerator {
         }
 
         final Message msg = new MimeMessage();
-        msg.setSubject(getSubject(DataType.MMS, details.getRecipient()));
+        msg.setSubject(getSubject(DataType.MMS, details.getRecipient(), simCardNumber));
 
         if (details.inbound) {
             // msg_box == MmsConsts.MESSAGE_BOX_INBOX does not work
@@ -151,7 +151,7 @@ class MessageGenerator {
         return msg;
     }
 
-    private  @Nullable Message messageFromMapCallLog(Map<String, String> msgMap) throws MessagingException {
+    private  @Nullable Message messageFromMapCallLog(Map<String, String> msgMap, int simCardNumber) throws MessagingException {
         final String address = msgMap.get(CallLog.Calls.NUMBER);
         final int callType = toInt(msgMap.get(CallLog.Calls.TYPE));
 
@@ -163,7 +163,7 @@ class MessageGenerator {
         if (!includePersonInBackup(record, DataType.CALLLOG)) return null;
 
         final Message msg = new MimeMessage();
-        msg.setSubject(getSubject(DataType.CALLLOG, record));
+        msg.setSubject(getSubject(DataType.CALLLOG, record, simCardNumber));
 
         switch (callType) {
             case CallLog.Calls.OUTGOING_TYPE:
@@ -197,10 +197,9 @@ class MessageGenerator {
         return msg;
     }
 
-    private String getSubject(@NotNull DataType type, @NotNull PersonRecord record) {
-        //TODO: Folder is fixed to -1, correct?
+    private String getSubject(@NotNull DataType type, @NotNull PersonRecord record, int simCardNumber) {
         return mPrefix ?
-                String.format(Locale.ENGLISH, "[%s] %s", type.getFolder(PreferenceManager.getDefaultSharedPreferences(mContext), -1), record.getName()) :
+                String.format(Locale.ENGLISH, "[%s] %s", type.getFolder(PreferenceManager.getDefaultSharedPreferences(mContext), simCardNumber), record.getName()) :
                 mContext.getString(type.withField, record.getName());
     }
 

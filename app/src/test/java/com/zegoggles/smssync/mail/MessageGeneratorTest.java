@@ -54,20 +54,20 @@ public class MessageGeneratorTest {
 
     @Test public void testShouldReturnNullIfMessageHasNoAddress() throws Exception {
         Map<String, String> map = new HashMap<String, String>();
-        Message msg = generator.messageForDataType(map, DataType.SMS);
+        Message msg = generator.messageForDataType(map, DataType.SMS, simCardNumber);
         assertThat(msg).isNull();
     }
 
     @Test public void testShouldGenerateSubjectWithNameForSMS() throws Exception {
         PersonRecord record = new PersonRecord(1, "Test Testor", null, null);
-        Message msg = generator.messageForDataType(mockMessage("1234", record), DataType.SMS);
+        Message msg = generator.messageForDataType(mockMessage("1234", record), DataType.SMS, simCardNumber);
         assertThat(msg).isNotNull();
         assertThat(msg.getSubject()).isEqualTo("SMS with Test Testor");
     }
 
     @Test public void testShouldGenerateSMSMessageWithCorrectEncoding() throws Exception {
         PersonRecord record = new PersonRecord(1, "Test Testor", null, null);
-        Message msg = generator.messageForDataType(mockMessage("1234", record), DataType.SMS);
+        Message msg = generator.messageForDataType(mockMessage("1234", record), DataType.SMS, simCardNumber);
         assertThat(msg.getHeader(MimeHeader.HEADER_CONTENT_TRANSFER_ENCODING)).isEqualTo(new String[] {
                 MimeUtil.ENC_QUOTED_PRINTABLE
         });
@@ -81,7 +81,7 @@ public class MessageGeneratorTest {
                 new Address("foo@bar.com"));
 
         when(mmsSupport.getDetails(any(Uri.class), any(AddressStyle.class))).thenReturn(details);
-        Message msg = generator.messageForDataType(mockMessage("1234", personRecord), DataType.MMS);
+        Message msg = generator.messageForDataType(mockMessage("1234", personRecord), DataType.MMS, simCardNumber);
 
         assertThat(msg).isNotNull();
         assertThat(msg.getSubject()).isEqualTo("SMS with Foo Bar");
@@ -94,7 +94,7 @@ public class MessageGeneratorTest {
                 new Address("foo@bar.com"));
 
         when(mmsSupport.getDetails(any(Uri.class), any(AddressStyle.class))).thenReturn(details);
-        Message msg = generator.messageForDataType(mockMessage("1234", personRecord), DataType.MMS);
+        Message msg = generator.messageForDataType(mockMessage("1234", personRecord), DataType.MMS, simCardNumber);
         assertThat(msg.getHeader(MimeHeader.HEADER_CONTENT_TRANSFER_ENCODING)).isEqualTo(new String[] {
                 MimeUtil.ENC_7BIT
         });
@@ -102,7 +102,7 @@ public class MessageGeneratorTest {
 
     @Test public void testShouldGenerateMessageForCallLogOutgoing() throws Exception {
         PersonRecord record = new PersonRecord(-1, "Test Testor", null, null);
-        Message msg = generator.messageForDataType(mockCalllogMessage("1234", CallLog.Calls.OUTGOING_TYPE, record), DataType.CALLLOG);
+        Message msg = generator.messageForDataType(mockCalllogMessage("1234", CallLog.Calls.OUTGOING_TYPE, record), DataType.CALLLOG, simCardNumber);
         assertThat(msg).isNotNull();
         assertThat(msg.getSubject()).isEqualTo("Call with Test Testor");
         assertThat(msg.getFrom()[0]).isEqualTo(me);
@@ -111,7 +111,7 @@ public class MessageGeneratorTest {
 
     @Test public void testShouldGenerateMessageForCallLogIncoming() throws Exception {
         PersonRecord record = new PersonRecord(-1, "Test Testor", null, null);
-        Message msg = generator.messageForDataType(mockCalllogMessage("1234", CallLog.Calls.INCOMING_TYPE, record), DataType.CALLLOG);
+        Message msg = generator.messageForDataType(mockCalllogMessage("1234", CallLog.Calls.INCOMING_TYPE, record), DataType.CALLLOG, simCardNumber);
         assertThat(msg).isNotNull();
         assertThat(msg.getSubject()).isEqualTo("Call with Test Testor");
         assertThat(msg.getFrom()[0].toString()).isEqualTo("Test Testor <unknown.number@unknown.email>");
@@ -120,7 +120,7 @@ public class MessageGeneratorTest {
 
     @Test public void testShouldGenerateMessageForCallLogMissed() throws Exception {
         PersonRecord record = new PersonRecord(-1, "Test Testor", null, null);
-        Message msg = generator.messageForDataType(mockCalllogMessage("1234", CallLog.Calls.MISSED_TYPE, record), DataType.CALLLOG);
+        Message msg = generator.messageForDataType(mockCalllogMessage("1234", CallLog.Calls.MISSED_TYPE, record), DataType.CALLLOG, simCardNumber);
         assertThat(msg).isNotNull();
         assertThat(msg.getSubject()).isEqualTo("Call with Test Testor");
         assertThat(msg.getFrom()[0].toString()).isEqualTo("Test Testor <unknown.number@unknown.email>");
@@ -129,7 +129,7 @@ public class MessageGeneratorTest {
 
     @Test public void testShouldGenerateMessageForCallLogIncomingUnknown() throws Exception {
         PersonRecord record = new PersonRecord(0, null, null, "-1");
-        Message msg = generator.messageForDataType(mockCalllogMessage("", CallLog.Calls.INCOMING_TYPE, record), DataType.CALLLOG);
+        Message msg = generator.messageForDataType(mockCalllogMessage("", CallLog.Calls.INCOMING_TYPE, record), DataType.CALLLOG, simCardNumber);
         assertThat(msg).isNotNull();
         assertThat(msg.getSubject()).isEqualTo("Call with Unknown");
         assertThat(msg.getFrom()[0].toString()).isEqualTo("Unknown <unknown.number@unknown.email>");
@@ -138,7 +138,7 @@ public class MessageGeneratorTest {
 
     @Test public void testShouldGenerateCallLogMessageWithCorrectEncoding() throws Exception {
         PersonRecord record = new PersonRecord(-1, "Test Testor", null, null);
-        Message msg = generator.messageForDataType(mockCalllogMessage("1234", CallLog.Calls.OUTGOING_TYPE, record), DataType.CALLLOG);
+        Message msg = generator.messageForDataType(mockCalllogMessage("1234", CallLog.Calls.OUTGOING_TYPE, record), DataType.CALLLOG, simCardNumber);
         assertThat(msg.getHeader(MimeHeader.HEADER_CONTENT_TRANSFER_ENCODING)).isEqualTo(new String[] {
                 MimeUtil.ENC_QUOTED_PRINTABLE
         });
@@ -146,21 +146,21 @@ public class MessageGeneratorTest {
 
     @Test public void testShouldGenerateSubjectWithNameAndNumberForSMS() throws Exception {
         PersonRecord record = new PersonRecord(1, "Test Testor", "test@test.com", "1234");
-        Message msg = generator.messageForDataType(mockMessage("1234", record), DataType.SMS);
+        Message msg = generator.messageForDataType(mockMessage("1234", record), DataType.SMS, simCardNumber);
         assertThat(msg).isNotNull();
         assertThat(msg.getSubject()).isEqualTo("SMS with Test Testor");
     }
 
     @Test public void shouldGenerateCorrectFromHeaderWithUsersEmailAddress() throws Exception {
         PersonRecord record = new PersonRecord(1, "Test Testor", "test@test.com", "1234");
-        Message msg = generator.messageForDataType(mockMessage("1234", record), DataType.SMS);
+        Message msg = generator.messageForDataType(mockMessage("1234", record), DataType.SMS, simCardNumber);
         assertThat(msg).isNotNull();
         assertThat(msg.getFrom()[0]).isEqualTo(me);
     }
 
     @Test public void shouldGenerateCorrectToHeader() throws Exception {
         PersonRecord record = new PersonRecord(1, "Test Testor", "test@test.com", "1234");
-        Message msg = generator.messageForDataType(mockMessage("1234", record), DataType.SMS);
+        Message msg = generator.messageForDataType(mockMessage("1234", record), DataType.SMS, simCardNumber);
         assertThat(msg).isNotNull();
 
         assertThat(msg.getRecipients(Message.RecipientType.TO)[0].toString())
@@ -175,7 +175,7 @@ public class MessageGeneratorTest {
         map.put(Telephony.TextBasedSmsColumns.DATE, String.valueOf(date.getTime()));
         map.put(Telephony.TextBasedSmsColumns.TYPE, "0");
 
-        Message msg = generator.messageForDataType(map, DataType.SMS);
+        Message msg = generator.messageForDataType(map, DataType.SMS, simCardNumber);
         assertThat(msg).isNotNull();
 
         verify(headerGenerator).setHeaders(any(Message.class),
@@ -192,7 +192,7 @@ public class MessageGeneratorTest {
         Map<String, String> map = mockMessage("1234", record);
         map.put(Telephony.TextBasedSmsColumns.TYPE, "1");
 
-        Message msg = generator.messageForDataType(map, DataType.SMS);
+        Message msg = generator.messageForDataType(map, DataType.SMS, simCardNumber);
         assertThat(msg).isNotNull();
 
         assertThat(msg.getFrom()[0].toString())
@@ -203,7 +203,7 @@ public class MessageGeneratorTest {
 
     @Test public void testShouldUseNumberIfNameIsUnknown() throws Exception {
         PersonRecord record = new PersonRecord(-1, null, null, "1234");
-        Message msg = generator.messageForDataType(mockMessage("1234", record), DataType.SMS);
+        Message msg = generator.messageForDataType(mockMessage("1234", record), DataType.SMS, simCardNumber);
         assertThat(msg).isNotNull();
         assertThat(msg.getSubject()).isEqualTo("SMS with 1234");
     }
@@ -223,9 +223,9 @@ public class MessageGeneratorTest {
         map.put(Telephony.TextBasedSmsColumns.TYPE, "1");
 
         when(groupIds.contains(record)).thenReturn(false);
-        assertThat(generator.messageForDataType(map, DataType.SMS)).isNull();
+        assertThat(generator.messageForDataType(map, DataType.SMS, simCardNumber)).isNull();
         when(groupIds.contains(record)).thenReturn(true);
-        assertThat(generator.messageForDataType(map, DataType.SMS)).isNotNull();
+        assertThat(generator.messageForDataType(map, DataType.SMS, simCardNumber)).isNotNull();
     }
 
     private Map<String, String> mockMessage(String address, PersonRecord record) {

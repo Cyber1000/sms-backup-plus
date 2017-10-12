@@ -118,11 +118,11 @@ public class MessageConverterTest {
         messageConverter = new MessageConverter(RuntimeEnvironment.application,
                 preferences, "foo@example.com", personLookup, contactAccessor);
 
-        ConversionResult res = messageConverter.convertMessages(cursor, DataType.SMS);
+        ConversionResult res = messageConverter.convertMessages(cursor, DataType.SMS, cursor.simCardNumber);
         assertThat(res.getMessages().get(0).isSet(Flag.SEEN)).isFalse();
 
         cursor.moveToNext();
-        res = messageConverter.convertMessages(cursor, DataType.SMS);
+        res = messageConverter.convertMessages(cursor, DataType.SMS, cursor.simCardNumber);
         assertThat(res.getMessages().get(0).isSet(Flag.SEEN)).isTrue();
     }
 
@@ -140,11 +140,11 @@ public class MessageConverterTest {
         messageConverter = new MessageConverter(RuntimeEnvironment.application,
                 preferences, "foo@example.com", personLookup, contactAccessor);
 
-        ConversionResult res = messageConverter.convertMessages(cursor, DataType.SMS);
+        ConversionResult res = messageConverter.convertMessages(cursor, DataType.SMS, cursor.simCardNumber);
         assertThat(res.getMessages().get(0).isSet(Flag.SEEN)).isFalse();
 
         cursor.moveToNext();
-        res = messageConverter.convertMessages(cursor, DataType.SMS);
+        res = messageConverter.convertMessages(cursor, DataType.SMS, cursor.simCardNumber);
         assertThat(res.getMessages().get(0).isSet(Flag.SEEN)).isFalse();
     }
 
@@ -162,11 +162,11 @@ public class MessageConverterTest {
         messageConverter = new MessageConverter(RuntimeEnvironment.application,
                 preferences, "foo@example.com", personLookup, contactAccessor);
 
-        ConversionResult res = messageConverter.convertMessages(cursor, DataType.SMS);
+        ConversionResult res = messageConverter.convertMessages(cursor, DataType.SMS, cursor.simCardNumber);
         assertThat(res.getMessages().get(0).isSet(Flag.SEEN)).isTrue();
 
         cursor.moveToNext();
-        res = messageConverter.convertMessages(cursor, DataType.SMS);
+        res = messageConverter.convertMessages(cursor, DataType.SMS, cursor.simCardNumber);
         assertThat(res.getMessages().get(0).isSet(Flag.SEEN)).isTrue();
     }
 

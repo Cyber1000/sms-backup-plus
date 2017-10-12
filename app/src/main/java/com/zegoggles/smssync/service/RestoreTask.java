@@ -107,11 +107,11 @@ class RestoreTask extends AsyncTask<RestoreConfig, RestoreState, RestoreState> {
             final List<Message> msgs = new ArrayList<Message>();
 
             if (config.restoreSms) {
-                //TODO: Folder is fixed to -1, correct?
+                //TODO: Folder is fixed to -1, restore won't work this way
                 msgs.addAll(imapStore.getFolder(SMS, -1).getMessages(config.maxRestore, config.restoreOnlyStarred, null));
             }
             if (config.restoreCallLog) {
-                //TODO: Folder is fixed to -1, correct?
+                //TODO: Folder is fixed to -1, restore won't work this way
                 msgs.addAll(imapStore.getFolder(CALLLOG, -1).getMessages(config.maxRestore, config.restoreOnlyStarred, null));
             }
 

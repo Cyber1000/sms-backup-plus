@@ -111,11 +111,11 @@ public class MessageConverter {
         }
     }
 
-    public @NotNull ConversionResult convertMessages(final Cursor cursor, DataType dataType)
+    public @NotNull ConversionResult convertMessages(final Cursor cursor, DataType dataType, int simCardNumber)
             throws MessagingException {
 
         final Map<String, String> msgMap = getMessageMap(cursor);
-        final Message m = mMessageGenerator.messageForDataType(msgMap, dataType);
+        final Message m = mMessageGenerator.messageForDataType(msgMap, dataType, simCardNumber);
         final ConversionResult result = new ConversionResult(dataType);
         if (m != null) {
             m.setFlag(Flag.SEEN, markAsSeen(dataType, msgMap));
