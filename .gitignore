@@ -17,3 +17,5 @@ proguard.cfg
 proguard-project.txt
 .gradle
 build
+.vagrant
+localfiles
