@@ -1,2 +1,2 @@
 eval $(ssh-agent -s)
-ssh-add /vagrant/localfiles/ssh/id_rsa
+ssh-add /home/vagrant/.ssh/id_rsa
