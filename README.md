@@ -404,6 +404,18 @@ to join it in order to get automatic updates.
 
 I've imported some relevant issues from the [original issue list][] to [github issues][].
 
+## <a name="vagrant">Coding with vagrant</a>
+
+You can also use a vagrant box to code. 
+ * Install vagrant and virtualbox and do a "vagrant up" in the downloaded dir.
+ * Have a cup of coffee (or two)
+ * The last step in this script is a shutdown of the newly created virtaulbox
+ * if you want to use your mobile within vagrant change the created virtualbox manually (activae USB 3.0 and add your mobile)
+ * vagrant up again, choose lxde and login with password vagrant (on the first time you may have to shutdown again and restart, I have at least one issue here)
+ * open Programming -> Android Studio and go through wizard (probably some components will have to be downloaded later)
+ * open this project (you find it within /vagrant)
+ * you are ready! Connect your mobile, build the sources, start debug, do whatever you want.
+
 ### <a name="translating">Translating the UI</a>
 
 If you want to help translating the UI to other languages download and
